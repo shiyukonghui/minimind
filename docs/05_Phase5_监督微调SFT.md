@@ -46,7 +46,7 @@ python train_full_sft.py --from_resume 1
 | `--batch_size` | 16 | 批次大小 |
 | `--learning_rate` | 5e-7 | 学习率（远小于预训练） |
 | `--from_weight` | pretrain | 基于预训练权重 |
-| `--data_path` | ../dataset/sft_mini_512.jsonl | SFT 数据路径 |
+| `--data_path` | ../dataset/sft_t2t_mini.jsonl | SFT 数据路径 |
 | `--max_seq_len` | 512 | 最大序列长度 |
 
 **注意**：SFT 的学习率（5e-7）远小于预训练（5e-4），因为微调阶段只需小幅调整模型参数，避免"遗忘"预训练知识。
@@ -155,24 +155,24 @@ model, tokenizer = init_model(lm_config, 'pretrain', device=args.device)
 
 | 模型 | 数据集 | 单卡 3090 时间 | 成本 |
 |------|--------|---------------|------|
-| MiniMind2-Small | sft_mini_512.jsonl | ~1h | ~1.3元 |
-| MiniMind2 | sft_mini_512.jsonl | ~3.3h | ~4.29元 |
+| MiniMind2-Small | sft_t2t_mini.jsonl | ~1h | ~1.3元 |
+| MiniMind2 | sft_t2t_mini.jsonl | ~3.3h | ~4.29元 |
 
 ## 五、SFT 数据选择策略
 
 ### 5.1 快速训练方案
 
-使用 `sft_mini_512.jsonl`（1.2GB），最快速度获得可对话模型。
+使用 `sft_t2t_mini.jsonl`（1.6GB），最快速度获得可对话模型。
 
 ### 5.2 完整训练方案
 
-使用 `sft_512.jsonl` + `sft_2048.jsonl`，效果更好但耗时更长。
+使用 `sft_t2t.jsonl`，效果更好但耗时更长。
 
 ### 5.3 长度外推
 
-SFT 默认 `max_seq_len=512`，如需更长的对话能力：
+SFT 默认 `max_seq_len=768`，如需更长的对话能力：
 
-1. 使用 `sft_1024.jsonl` 或 `sft_2048.jsonl` 进行微调
+1. 使用 `sft_t2t.jsonl` 进行微调
 2. 设置对应的 `max_seq_len`
 3. 配合 RoPE 长度外推（YaRN 算法）
 

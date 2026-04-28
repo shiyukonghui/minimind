@@ -26,8 +26,8 @@
 
 | 模型 | 数据集 | 单卡 3090 时间 | 成本 |
 |------|--------|---------------|------|
-| MiniMind2-Small (26M) | pretrain_hq.jsonl | ~1.1h | ~1.43元 |
-| MiniMind2 (104M) | pretrain_hq.jsonl | ~3.9h | ~5.07元 |
+| MiniMind2-Small (26M) | pretrain_t2t_mini.jsonl | ~1.1h | ~1.43元 |
+| MiniMind2 (104M) | pretrain_t2t_mini.jsonl | ~3.9h | ~5.07元 |
 
 ## 二、训练脚本详解
 
@@ -57,7 +57,7 @@ python trainer/train_pretrain.py --from_resume 1
 | `--num_hidden_layers` | 8 | Transformer 层数 |
 | `--use_moe` | 0 | 是否使用 MoE |
 | `--dtype` | bfloat16 | 混合精度类型 |
-| `--data_path` | ../dataset/pretrain_hq.jsonl | 数据路径 |
+| `--data_path` | ../dataset/pretrain_t2t_mini.jsonl | 数据路径 |
 
 ### 2.3 训练脚本核心流程
 
@@ -323,7 +323,7 @@ wandb.log({"loss": loss, "lr": lr})
 
 ```bash
 # 下载预训练数据集
-# 放到 ./dataset/pretrain_hq.jsonl
+# 放到 ./dataset/pretrain_t2t_mini.jsonl
 
 # 启动训练
 cd trainer

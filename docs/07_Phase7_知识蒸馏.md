@@ -173,15 +173,15 @@ teacher_logits = teacher_logits[..., :vocab_size_student]
 
 ### 4.1 数据来源
 
-`sft_1024.jsonl` 和 `sft_2048.jsonl` 来自 Qwen2.5-7B/72B-Instruct 的对话数据，本质上是黑盒蒸馏的结果。
+`sft_t2t.jsonl` 和 `sft_t2t_mini.jsonl` 包含来自 Qwen3 系列的合成数据，例如基于 `qwen3-4b` 合成的约 `10w` 条 `tool call` 数据，以及 `qwen3` 系列的 `reasoning` 数据等，本质上是黑盒蒸馏的结果。
 
 ### 4.2 使用方法
 
 黑盒蒸馏与普通 SFT 完全一致，只是数据来源不同：
 
 ```bash
-# 使用 Qwen2.5 蒸馏数据进行 SFT
-python train_full_sft.py --data_path ../dataset/sft_1024.jsonl --max_seq_len 1024
+# 使用 Qwen3 蒸馏数据进行 SFT
+python train_full_sft.py --data_path ../dataset/sft_t2t_mini.jsonl --max_seq_len 768
 ```
 
 ## 五、动手练习
