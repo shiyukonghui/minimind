@@ -31,6 +31,32 @@ warnings.filterwarnings('ignore')
 
 
 # ============================================================
+# 兼容性SFT数据集：处理带tools/functions字段的异常数据
+# ============================================================
+class RobustSFTDataset(SFTDataset):
+    """SFTDataset的健壮子类，处理apply_chat_template中的异常"""
+
+    def _create_chat_prompt(self, cs):
+        try:
+            return super()._create_chat_prompt(cs)
+        except (TypeError, KeyError, ValueError):
+            # 回退方案：去除tools/functions等导致异常的字段，只保留role+content
+            clean_messages = []
+            for msg in cs:
+                if msg.get('role') in ('user', 'assistant', 'system'):
+                    clean_messages.append({
+                        'role': msg['role'],
+                        'content': msg.get('content', '')
+                    })
+            return self.tokenizer.apply_chat_template(
+                clean_messages,
+                tokenize=False,
+                add_generation_prompt=False,
+                tools=None
+            )
+
+
+# ============================================================
 # 蒸馏损失函数（复用项目已有实现）
 # ============================================================
 def distillation_loss(student_logits, teacher_logits, temperature=1.0, reduction='batchmean'):
@@ -277,7 +303,7 @@ if __name__ == "__main__":
     parser.add_argument("--grad_clip", type=float, default=1.0, help="梯度裁剪阈值")
     parser.add_argument("--log_interval", type=int, default=100, help="日志打印间隔")
     parser.add_argument("--save_interval", type=int, default=100, help="模型保存间隔")
-    parser.add_argument("--num_workers", type=int, default=1, help="数据加载线程数")
+    parser.add_argument("--num_workers", type=int, default=0, help="数据加载线程数(Windows建议0)")
 
     # 阶段一参数（与基线一致）
     parser.add_argument("--phase1_data_path", type=str, default="dataset/pretrain_t2t_mini.jsonl", help="预训练数据路径")
@@ -416,8 +442,8 @@ if __name__ == "__main__":
     # 假死神经元检测器
     dead_detector = DeadNeuronDetector(_get_raw_model())
 
-    # 阶段三训练数据（SFT数据集）
-    sft_ds = SFTDataset(args.phase3_data_path, tokenizer, max_length=args.max_seq_len)
+    # 阶段三训练数据（SFT数据集，使用兼容性子类处理带tools的数据）
+    sft_ds = RobustSFTDataset(args.phase3_data_path, tokenizer, max_length=args.max_seq_len)
     sft_sampler = DistributedSampler(sft_ds) if dist.is_initialized() else None
 
     # 重新初始化优化器（更低的学习率）
