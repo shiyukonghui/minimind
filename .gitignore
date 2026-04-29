@@ -6,3 +6,6 @@ dataset
 target
 link-code
 __pycache__
+*.pth
+*.safetensors
+*.mdl
