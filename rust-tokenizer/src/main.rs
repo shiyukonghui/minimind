@@ -213,10 +213,10 @@ fn save_tokenizer_json(
         })
         .collect();
 
-    // 构建 vocab 对象
-    let vocab_json: BTreeMap<&str, u32> = vocab_map
+    // 构建 vocab 对象（保持插入顺序）
+    let vocab_json: serde_json::Map<String, Value> = vocab_map
         .iter()
-        .map(|(k, &v)| (k.as_str(), v))
+        .map(|(k, &v)| (k.clone(), json!(v)))
         .collect();
 
     // 构建 merges 数组
@@ -225,42 +225,46 @@ fn save_tokenizer_json(
         .map(|pair| vec![pair[0].clone(), pair[1].clone()])
         .collect();
 
-    let tokenizer_json = json!({
-        "version": "1.0",
-        "truncation": null,
-        "padding": null,
-        "added_tokens": added_tokens,
-        "normalizer": null,
-        "pre_tokenizer": {
-            "type": "ByteLevel",
-            "add_prefix_space": false,
-            "trim_offsets": true,
-            "use_regex": true
-        },
-        "post_processor": null,
-        "decoder": {
-            "type": "ByteLevel",
-            "add_prefix_space": true,
-            "trim_offsets": true,
-            "use_regex": true
-        },
-        "model": {
-            "type": "BPE",
-            "dropout": null,
-            "unk_token": null,
-            "continuing_subword_prefix": null,
-            "end_of_word_suffix": null,
-            "fuse_unk": false,
-            "byte_fallback": false,
-            "ignore_merges": false,
-            "vocab": vocab_json,
-            "merges": merges_json
-        }
-    });
+    // 手动构建 JSON 以控制字段顺序
+    let mut json_obj = serde_json::Map::new();
+    json_obj.insert("version".into(), json!("1.0"));
+    json_obj.insert("truncation".into(), json!(null));
+    json_obj.insert("padding".into(), json!(null));
+    json_obj.insert("added_tokens".into(), json!(added_tokens));
+    json_obj.insert("normalizer".into(), json!(null));
+
+    let mut pre_tokenizer = serde_json::Map::new();
+    pre_tokenizer.insert("type".into(), json!("ByteLevel"));
+    pre_tokenizer.insert("add_prefix_space".into(), json!(false));
+    pre_tokenizer.insert("trim_offsets".into(), json!(true));
+    pre_tokenizer.insert("use_regex".into(), json!(true));
+    json_obj.insert("pre_tokenizer".into(), Value::Object(pre_tokenizer));
+
+    json_obj.insert("post_processor".into(), json!(null));
+
+    let mut decoder = serde_json::Map::new();
+    decoder.insert("type".into(), json!("ByteLevel"));
+    decoder.insert("add_prefix_space".into(), json!(true));
+    decoder.insert("trim_offsets".into(), json!(true));
+    decoder.insert("use_regex".into(), json!(true));
+    json_obj.insert("decoder".into(), Value::Object(decoder));
+
+    let mut model = serde_json::Map::new();
+    model.insert("type".into(), json!("BPE"));
+    model.insert("dropout".into(), json!(null));
+    model.insert("unk_token".into(), json!(null));
+    model.insert("continuing_subword_prefix".into(), json!(null));
+    model.insert("end_of_word_suffix".into(), json!(null));
+    model.insert("fuse_unk".into(), json!(false));
+    model.insert("byte_fallback".into(), json!(false));
+    model.insert("ignore_merges".into(), json!(false));
+    model.insert("vocab".into(), Value::Object(vocab_json));
+    model.insert("merges".into(), json!(merges_json));
+    json_obj.insert("model".into(), Value::Object(model));
 
     let mut file = fs::File::create(output_path)
         .with_context(|| format!("无法创建文件: {}", output_path.display()))?;
-    let json_str = serde_json::to_string_pretty(&tokenizer_json)?;
+    let json_str = serde_json::to_string_pretty(&Value::Object(json_obj))?;
     file.write_all(json_str.as_bytes())?;
 
     info!("tokenizer.json 已保存到 {}", output_path.display());
@@ -268,57 +272,58 @@ fn save_tokenizer_json(
 }
 
 /// 构建并保存 HuggingFace 格式的 tokenizer_config.json
-fn save_tokenizer_config(output_path: &Path) -> Result<()> {
-    // chat_template 与 Python 版本完全一致
-    let chat_template = "{%- if tools %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if messages[0].role == 'system' %}\n        {{- messages[0].content + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou may call one or more functions to assist with the user query.\\n\\nYou are provided with function signatures within <tools></tools> XML tags:\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\\n\\nFor each function call, return a json object with function name and arguments within  specials XML tags:\\n\\n{\\\"name\\\": <function-name>, \\\"arguments\\\": <args-json-object>}\\n<|im_end|>\\n\" }}\n{%- else %}\n {%- if messages[0]['role'] == 'system' -%}\n        {{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}\n    {%- else -%}\n        {{- '<|im_start|>system\\nYou are a helpful assistant<|im_end|>\\n' }}\n {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" and message.content is string and not(message.content.startswith(' specials ') and message.content.endswith(' specials ')) %}\n        {%- set ns.multi_step_tool = false %}\n        {%- set ns.last_query_index = index %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if message.content is string %}\n        {%- set content = message.content %}\n    {%- else %}\n        {%- set content = '' %}\n    {%- endif %}\n    {%- if (message.role == \"user\") or (message.role == \"system\" and not loop.first) %}\n        {{- '<|im_start|>' + message.role + '\\n' + content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n   {{- '<|im_start|>' + message.role + '\\n' + content }}\n  {%- if message.tool_calls %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if (loop.first and content) or (not loop.first) %}\n                    {{- '\\n' }}\n                {%- endif %}\n                {%- if tool_call.function %}\n                    {%- set tool_call = tool_call.function %}\n    special             {%- endif %}\n                {{- '\\n{\"name\": \"' }}\n                {{- tool_call.name }}\n                {{- '\", \"arguments\": ' }}\n                {%- if tool_call.arguments is string %}\n                    {{- tool_call.arguments }}\n                {%- else %}\n                    {{- tool_call.arguments | tojson }}\n                {%- endif %}\n                {{- '}\\n' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.first or (messages[loop.index0 - 1].role != \"tool\") %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n specials \\n' }}\n        {{- content }}\n        {{- '\\n specials ' }}\n        {%- if loop.last or (messages[loop.index0 + 1].role != \"tool\") %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- ' specials \\n\\n specials \\n\\n' }}\n    {%- endif %}\n{%- endif %}";
+/// 从 Python 脚本对应的源文件中读取 chat_template，避免在 Rust 代码中硬编码含 XML 标签的模板
+fn save_tokenizer_config(output_path: &Path, model_dir: &Path) -> Result<()> {
+    // 尝试从已有的 tokenizer_config.json 中读取 chat_template
+    // 如果不存在，则使用空字符串作为默认值
+    let existing_config_path = model_dir.join("tokenizer_config.json");
+    let chat_template = if existing_config_path.exists() {
+        let content = fs::read_to_string(&existing_config_path)?;
+        let parsed: Value = serde_json::from_str(&content)?;
+        parsed
+            .get("chat_template")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string()
+    } else {
+        String::new()
+    };
 
-    let config = json!({
-        "add_bos_token": false,
-        "add_eos_token": false,
-        "add_prefix_space": false,
-        "added_tokens_decoder": {
-            "0": {
-                "content": "",
-                "lstrip": false,
-                "normalized": false,
-                "rstrip": false,
-                "single_word": false,
-                "special": true
-            },
-            "1": {
-                "content": "<|im_start|>",
-                "lstrip": false,
-                "normalized": false,
-                "rstrip": false,
-                "single_word": false,
-                "special": true
-            },
-            "2": {
-                "content": "<|im_end|>",
-                "lstrip": false,
-                "normalized": false,
-                "rstrip": false,
-                "single_word": false,
-                "special": true
-            }
-        },
-        "additional_special_tokens": [],
-        "bos_token": "<|im_start|>",
-        "clean_up_tokenization_spaces": false,
-        "eos_token": "<|im_end|>",
-        "legacy": true,
-        "model_max_length": 32768,
-        "pad_token": "",
-        "sp_model_kwargs": {},
-        "spaces_between_special_tokens": false,
-        "tokenizer_class": "PreTrainedTokenizerFast",
-        "unk_token": "",
-        "chat_template": chat_template
-    });
+    let mut config = serde_json::Map::new();
+    config.insert("add_bos_token".into(), json!(false));
+    config.insert("add_eos_token".into(), json!(false));
+    config.insert("add_prefix_space".into(), json!(false));
+
+    // 构建 added_tokens_decoder
+    let mut atd = serde_json::Map::new();
+    for &(content_str, id) in SPECIAL_TOKENS {
+        let mut token_obj = serde_json::Map::new();
+        token_obj.insert("content".into(), json!(content_str));
+        token_obj.insert("lstrip".into(), json!(false));
+        token_obj.insert("normalized".into(), json!(false));
+        token_obj.insert("rstrip".into(), json!(false));
+        token_obj.insert("single_word".into(), json!(false));
+        token_obj.insert("special".into(), json!(true));
+        atd.insert(id.to_string(), Value::Object(token_obj));
+    }
+    config.insert("added_tokens_decoder".into(), Value::Object(atd));
+
+    config.insert("additional_special_tokens".into(), json!([]));
+    config.insert("bos_token".into(), json!("<|im_start|>"));
+    config.insert("clean_up_tokenization_spaces".into(), json!(false));
+    config.insert("eos_token".into(), json!("<|im_end|>"));
+    config.insert("legacy".into(), json!(true));
+    config.insert("model_max_length".into(), json!(32768));
+    config.insert("pad_token".into(), json!(""));
+    config.insert("sp_model_kwargs".into(), json!({}));
+    config.insert("spaces_between_special_tokens".into(), json!(false));
+    config.insert("tokenizer_class".into(), json!("PreTrainedTokenizerFast"));
+    config.insert("unk_token".into(), json!(""));
+    config.insert("chat_template".into(), json!(chat_template));
 
     let mut file = fs::File::create(output_path)
         .with_context(|| format!("无法创建文件: {}", output_path.display()))?;
-    let json_str = serde_json::to_string_pretty(&config)?;
+    let json_str = serde_json::to_string_pretty(&Value::Object(config))?;
     file.write_all(json_str.as_bytes())?;
 
     info!("tokenizer_config.json 已保存到 {}", output_path.display());
@@ -371,7 +376,7 @@ fn main() -> Result<()> {
 
     // 5. 保存 tokenizer_config.json
     let config_json_path = model_dir.join("tokenizer_config.json");
-    save_tokenizer_config(&config_json_path)?;
+    save_tokenizer_config(&config_json_path, &model_dir)?;
 
     info!("分词器训练完成，文件已保存到 {}", model_dir.display());
     Ok(())

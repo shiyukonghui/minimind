@@ -5,3 +5,4 @@ docs-minimind/
 dataset
 target
 link-code
+__pycache__
