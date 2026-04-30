@@ -1,0 +1,944 @@
+{
+  "baseline_label": "baseline",
+  "dst_label": "dst",
+  "date": "2026-04-30",
+  "overall": {
+    "dimensions": [
+      "C-Eval 总体",
+      "C-Eval STEM",
+      "C-Eval 人文社科",
+      "CMMLU 总体",
+      "CMMLU STEM",
+      "CMMLU 人文社科"
+    ],
+    "baseline": [
+      23.328380386329865,
+      21.906693711967545,
+      25.78125,
+      25.090657917458124,
+      24.701873935264054,
+      24.960102138525375
+    ],
+    "dst": [
+      22.436849925705797,
+      21.095334685598377,
+      24.0234375,
+      25.34104645139009,
+      24.9290176036343,
+      25.566549632939672
+    ],
+    "deltas": [
+      -0.8915304606240682,
+      -0.8113590263691677,
+      -1.7578125,
+      0.2503885339319645,
+      0.22714366837024613,
+      0.6064474944142972
+    ]
+  },
+  "ceval_subfields": {
+    "labels": [
+      "数学",
+      "物理",
+      "化学/生物/医学",
+      "计算机",
+      "工程/应用",
+      "人文社科"
+    ],
+    "baseline": [
+      28.888888888888886,
+      15.789473684210526,
+      18.51851851851852,
+      25.0,
+      19.51219512195122,
+      24.907521578298397
+    ],
+    "dst": [
+      23.333333333333332,
+      21.052631578947366,
+      21.164021164021165,
+      20.833333333333336,
+      19.51219512195122,
+      23.181257706535142
+    ],
+    "deltas": [
+      -5.555555555555554,
+      5.263157894736841,
+      2.6455026455026456,
+      -4.166666666666664,
+      0.0,
+      -1.7262638717632548
+    ]
+  },
+  "cmmlu_subfields": {
+    "labels": [
+      "数学/逻辑",
+      "物理/工程",
+      "化学/生物/医学",
+      "计算机",
+      "人文/社科/法律",
+      "经济/管理/教育"
+    ],
+    "baseline": [
+      24.489795918367346,
+      24.33234421364985,
+      25.532770406111784,
+      26.13333333333333,
+      24.58471760797342,
+      25.38479753729576
+    ],
+    "dst": [
+      25.218658892128282,
+      24.480712166172104,
+      24.728588661037396,
+      25.333333333333336,
+      25.12836001208094,
+      26.00047359696898
+    ],
+    "deltas": [
+      0.7288629737609362,
+      0.14836795252225343,
+      -0.8041817450743878,
+      -0.7999999999999936,
+      0.5436424041075192,
+      0.6156760596732198
+    ]
+  },
+  "ceval_task_deltas": [
+    {
+      "task": "plant_protection",
+      "zh": "植物保护",
+      "baseline": 0.0909,
+      "dst": 0.3182,
+      "delta": 0.2273
+    },
+    {
+      "task": "high_school_biology",
+      "zh": "高中生物",
+      "baseline": 0.1579,
+      "dst": 0.3684,
+      "delta": 0.2105
+    },
+    {
+      "task": "marxism",
+      "zh": "马克思主义",
+      "baseline": 0.2632,
+      "dst": 0.4211,
+      "delta": 0.1579
+    },
+    {
+      "task": "college_chemistry",
+      "zh": "大学化学",
+      "baseline": 0.0417,
+      "dst": 0.1667,
+      "delta": 0.125
+    },
+    {
+      "task": "high_school_physics",
+      "zh": "高中物理",
+      "baseline": 0.1053,
+      "dst": 0.2105,
+      "delta": 0.1053
+    },
+    {
+      "task": "teacher_qualification",
+      "zh": "教师资格",
+      "baseline": 0.2273,
+      "dst": 0.2955,
+      "delta": 0.0682
+    },
+    {
+      "task": "fire_engineer",
+      "zh": "消防工程师",
+      "baseline": 0.1935,
+      "dst": 0.2581,
+      "delta": 0.0645
+    },
+    {
+      "task": "probability_and_statistics",
+      "zh": "概率与统计",
+      "baseline": 0.0556,
+      "dst": 0.1111,
+      "delta": 0.0556
+    },
+    {
+      "task": "college_physics",
+      "zh": "大学物理",
+      "baseline": 0.1579,
+      "dst": 0.2105,
+      "delta": 0.0526
+    },
+    {
+      "task": "sports_science",
+      "zh": "体育科学",
+      "baseline": 0.0526,
+      "dst": 0.1053,
+      "delta": 0.0526
+    },
+    {
+      "task": "middle_school_politics",
+      "zh": "中学政治",
+      "baseline": 0.2381,
+      "dst": 0.2857,
+      "delta": 0.0476
+    },
+    {
+      "task": "clinical_medicine",
+      "zh": "临床医学",
+      "baseline": 0.1818,
+      "dst": 0.2273,
+      "delta": 0.0455
+    },
+    {
+      "task": "veterinary_medicine",
+      "zh": "兽医学",
+      "baseline": 0.1739,
+      "dst": 0.2174,
+      "delta": 0.0435
+    },
+    {
+      "task": "accountant",
+      "zh": "会计",
+      "baseline": 0.1837,
+      "dst": 0.2245,
+      "delta": 0.0408
+    },
+    {
+      "task": "environmental_impact_assessment_engineer",
+      "zh": "环境影响评估工程师",
+      "baseline": 0.129,
+      "dst": 0.1613,
+      "delta": 0.0323
+    },
+    {
+      "task": "civil_servant",
+      "zh": "公务员",
+      "baseline": 0.234,
+      "dst": 0.2553,
+      "delta": 0.0213
+    },
+    {
+      "task": "tax_accountant",
+      "zh": "税务师",
+      "baseline": 0.1837,
+      "dst": 0.2041,
+      "delta": 0.0204
+    },
+    {
+      "task": "mao_zedong_thought",
+      "zh": "毛泽东思想",
+      "baseline": 0.3333,
+      "dst": 0.3333,
+      "delta": 0.0
+    },
+    {
+      "task": "high_school_mathematics",
+      "zh": "高中数学",
+      "baseline": 0.2222,
+      "dst": 0.2222,
+      "delta": 0.0
+    },
+    {
+      "task": "computer_architecture",
+      "zh": "计算机架构",
+      "baseline": 0.2857,
+      "dst": 0.2857,
+      "delta": 0.0
+    },
+    {
+      "task": "high_school_history",
+      "zh": "高中历史",
+      "baseline": 0.3,
+      "dst": 0.3,
+      "delta": 0.0
+    },
+    {
+      "task": "chinese_language_and_literature",
+      "zh": "中国语言文学",
+      "baseline": 0.2174,
+      "dst": 0.2174,
+      "delta": 0.0
+    },
+    {
+      "task": "middle_school_geography",
+      "zh": "中学地理",
+      "baseline": 0.0833,
+      "dst": 0.0833,
+      "delta": 0.0
+    },
+    {
+      "task": "middle_school_physics",
+      "zh": "中学物理",
+      "baseline": 0.2105,
+      "dst": 0.2105,
+      "delta": 0.0
+    },
+    {
+      "task": "physician",
+      "zh": "医师",
+      "baseline": 0.2857,
+      "dst": 0.2857,
+      "delta": 0.0
+    },
+    {
+      "task": "middle_school_history",
+      "zh": "中学历史",
+      "baseline": 0.1818,
+      "dst": 0.1818,
+      "delta": 0.0
+    },
+    {
+      "task": "high_school_geography",
+      "zh": "高中地理",
+      "baseline": 0.2105,
+      "dst": 0.2105,
+      "delta": 0.0
+    },
+    {
+      "task": "law",
+      "zh": "法律",
+      "baseline": 0.2083,
+      "dst": 0.2083,
+      "delta": 0.0
+    },
+    {
+      "task": "logic",
+      "zh": "逻辑学",
+      "baseline": 0.1818,
+      "dst": 0.1818,
+      "delta": 0.0
+    },
+    {
+      "task": "modern_chinese_history",
+      "zh": "近代中国史",
+      "baseline": 0.1739,
+      "dst": 0.1739,
+      "delta": 0.0
+    },
+    {
+      "task": "college_economics",
+      "zh": "大学经济学",
+      "baseline": 0.3091,
+      "dst": 0.2909,
+      "delta": -0.0182
+    },
+    {
+      "task": "college_programming",
+      "zh": "大学编程",
+      "baseline": 0.2703,
+      "dst": 0.2432,
+      "delta": -0.027
+    },
+    {
+      "task": "business_administration",
+      "zh": "工商管理",
+      "baseline": 0.2727,
+      "dst": 0.2424,
+      "delta": -0.0303
+    },
+    {
+      "task": "professional_tour_guide",
+      "zh": "导游",
+      "baseline": 0.3448,
+      "dst": 0.3103,
+      "delta": -0.0345
+    },
+    {
+      "task": "metrology_engineer",
+      "zh": "计量工程师",
+      "baseline": 0.1667,
+      "dst": 0.125,
+      "delta": -0.0417
+    },
+    {
+      "task": "legal_professional",
+      "zh": "法律职业",
+      "baseline": 0.087,
+      "dst": 0.0435,
+      "delta": -0.0435
+    },
+    {
+      "task": "middle_school_biology",
+      "zh": "中学生物",
+      "baseline": 0.2381,
+      "dst": 0.1905,
+      "delta": -0.0476
+    },
+    {
+      "task": "ideological_and_moral_cultivation",
+      "zh": "思想道德修养",
+      "baseline": 0.2632,
+      "dst": 0.2105,
+      "delta": -0.0526
+    },
+    {
+      "task": "advanced_mathematics",
+      "zh": "高等数学",
+      "baseline": 0.3684,
+      "dst": 0.3158,
+      "delta": -0.0526
+    },
+    {
+      "task": "operating_system",
+      "zh": "操作系统",
+      "baseline": 0.2105,
+      "dst": 0.1579,
+      "delta": -0.0526
+    },
+    {
+      "task": "high_school_chemistry",
+      "zh": "高中化学",
+      "baseline": 0.2632,
+      "dst": 0.2105,
+      "delta": -0.0526
+    },
+    {
+      "task": "high_school_politics",
+      "zh": "高中政治",
+      "baseline": 0.2632,
+      "dst": 0.2105,
+      "delta": -0.0526
+    },
+    {
+      "task": "electrical_engineer",
+      "zh": "电气工程师",
+      "baseline": 0.2703,
+      "dst": 0.2162,
+      "delta": -0.0541
+    },
+    {
+      "task": "education_science",
+      "zh": "教育学",
+      "baseline": 0.2414,
+      "dst": 0.1724,
+      "delta": -0.069
+    },
+    {
+      "task": "urban_and_rural_planner",
+      "zh": "城乡规划师",
+      "baseline": 0.3043,
+      "dst": 0.2174,
+      "delta": -0.087
+    },
+    {
+      "task": "middle_school_mathematics",
+      "zh": "中学数学",
+      "baseline": 0.2632,
+      "dst": 0.1579,
+      "delta": -0.1053
+    },
+    {
+      "task": "computer_network",
+      "zh": "计算机网络",
+      "baseline": 0.2105,
+      "dst": 0.1053,
+      "delta": -0.1053
+    },
+    {
+      "task": "middle_school_chemistry",
+      "zh": "中学化学",
+      "baseline": 0.3,
+      "dst": 0.15,
+      "delta": -0.15
+    },
+    {
+      "task": "high_school_chinese",
+      "zh": "高中语文",
+      "baseline": 0.3684,
+      "dst": 0.2105,
+      "delta": -0.1579
+    },
+    {
+      "task": "discrete_mathematics",
+      "zh": "离散数学",
+      "baseline": 0.5625,
+      "dst": 0.375,
+      "delta": -0.1875
+    },
+    {
+      "task": "basic_medicine",
+      "zh": "基础医学",
+      "baseline": 0.2632,
+      "dst": 0.0526,
+      "delta": -0.2105
+    },
+    {
+      "task": "art_studies",
+      "zh": "艺术学",
+      "baseline": 0.4545,
+      "dst": 0.2121,
+      "delta": -0.2424
+    }
+  ],
+  "cmmlu_task_deltas": [
+    {
+      "task": "modern_chinese",
+      "zh": "现代汉语",
+      "baseline": 0.1724,
+      "dst": 0.2414,
+      "delta": 0.069
+    },
+    {
+      "task": "ancient_chinese",
+      "zh": "古汉语",
+      "baseline": 0.2195,
+      "dst": 0.2866,
+      "delta": 0.0671
+    },
+    {
+      "task": "college_law",
+      "zh": "大学法律",
+      "baseline": 0.1667,
+      "dst": 0.2315,
+      "delta": 0.0648
+    },
+    {
+      "task": "high_school_physics",
+      "zh": "高中物理",
+      "baseline": 0.1909,
+      "dst": 0.2545,
+      "delta": 0.0636
+    },
+    {
+      "task": "high_school_biology",
+      "zh": "高中生物",
+      "baseline": 0.1953,
+      "dst": 0.2485,
+      "delta": 0.0533
+    },
+    {
+      "task": "food_science",
+      "zh": "食品科学",
+      "baseline": 0.1888,
+      "dst": 0.2238,
+      "delta": 0.035
+    },
+    {
+      "task": "journalism",
+      "zh": "新闻学",
+      "baseline": 0.25,
+      "dst": 0.2849,
+      "delta": 0.0349
+    },
+    {
+      "task": "professional_accounting",
+      "zh": "专业会计",
+      "baseline": 0.2343,
+      "dst": 0.2686,
+      "delta": 0.0343
+    },
+    {
+      "task": "business_ethics",
+      "zh": "商业伦理",
+      "baseline": 0.2201,
+      "dst": 0.2536,
+      "delta": 0.0335
+    },
+    {
+      "task": "machine_learning",
+      "zh": "机器学习",
+      "baseline": 0.2213,
+      "dst": 0.2541,
+      "delta": 0.0328
+    },
+    {
+      "task": "astronomy",
+      "zh": "天文学",
+      "baseline": 0.2182,
+      "dst": 0.2485,
+      "delta": 0.0303
+    },
+    {
+      "task": "college_mathematics",
+      "zh": "大学数学",
+      "baseline": 0.1905,
+      "dst": 0.219,
+      "delta": 0.0286
+    },
+    {
+      "task": "college_engineering_hydrology",
+      "zh": "大学工程水文学",
+      "baseline": 0.2736,
+      "dst": 0.3019,
+      "delta": 0.0283
+    },
+    {
+      "task": "elementary_mathematics",
+      "zh": "小学数学",
+      "baseline": 0.2522,
+      "dst": 0.2783,
+      "delta": 0.0261
+    },
+    {
+      "task": "agronomy",
+      "zh": "农学",
+      "baseline": 0.2249,
+      "dst": 0.2485,
+      "delta": 0.0237
+    },
+    {
+      "task": "marketing",
+      "zh": "市场营销",
+      "baseline": 0.25,
+      "dst": 0.2722,
+      "delta": 0.0222
+    },
+    {
+      "task": "professional_law",
+      "zh": "专业法律",
+      "baseline": 0.2322,
+      "dst": 0.2512,
+      "delta": 0.019
+    },
+    {
+      "task": "world_history",
+      "zh": "世界历史",
+      "baseline": 0.2236,
+      "dst": 0.2422,
+      "delta": 0.0186
+    },
+    {
+      "task": "sports_science",
+      "zh": "体育科学",
+      "baseline": 0.2424,
+      "dst": 0.2606,
+      "delta": 0.0182
+    },
+    {
+      "task": "professional_psychology",
+      "zh": "专业心理学",
+      "baseline": 0.25,
+      "dst": 0.2672,
+      "delta": 0.0172
+    },
+    {
+      "task": "elementary_information_and_technology",
+      "zh": "小学信息技术",
+      "baseline": 0.2563,
+      "dst": 0.2731,
+      "delta": 0.0168
+    },
+    {
+      "task": "chinese_teacher_qualification",
+      "zh": "教师资格考试",
+      "baseline": 0.2458,
+      "dst": 0.2626,
+      "delta": 0.0168
+    },
+    {
+      "task": "ethnology",
+      "zh": "民族学",
+      "baseline": 0.237,
+      "dst": 0.2519,
+      "delta": 0.0148
+    },
+    {
+      "task": "nutrition",
+      "zh": "营养学",
+      "baseline": 0.2414,
+      "dst": 0.2552,
+      "delta": 0.0138
+    },
+    {
+      "task": "arts",
+      "zh": "艺术",
+      "baseline": 0.2437,
+      "dst": 0.2562,
+      "delta": 0.0125
+    },
+    {
+      "task": "jurisprudence",
+      "zh": "法理学",
+      "baseline": 0.2482,
+      "dst": 0.2603,
+      "delta": 0.0122
+    },
+    {
+      "task": "elementary_chinese",
+      "zh": "小学语文",
+      "baseline": 0.2738,
+      "dst": 0.2857,
+      "delta": 0.0119
+    },
+    {
+      "task": "marxist_theory",
+      "zh": "马克思主义理论",
+      "baseline": 0.2434,
+      "dst": 0.254,
+      "delta": 0.0106
+    },
+    {
+      "task": "management",
+      "zh": "管理学",
+      "baseline": 0.2381,
+      "dst": 0.2476,
+      "delta": 0.0095
+    },
+    {
+      "task": "college_medical_statistics",
+      "zh": "医学统计学",
+      "baseline": 0.2453,
+      "dst": 0.2547,
+      "delta": 0.0094
+    },
+    {
+      "task": "college_education",
+      "zh": "大学教育",
+      "baseline": 0.3084,
+      "dst": 0.3178,
+      "delta": 0.0093
+    },
+    {
+      "task": "legal_and_moral_basis",
+      "zh": "法律与道德基础",
+      "baseline": 0.2523,
+      "dst": 0.2617,
+      "delta": 0.0093
+    },
+    {
+      "task": "anatomy",
+      "zh": "解剖学",
+      "baseline": 0.2635,
+      "dst": 0.2703,
+      "delta": 0.0068
+    },
+    {
+      "task": "education",
+      "zh": "教育学",
+      "baseline": 0.2577,
+      "dst": 0.2638,
+      "delta": 0.0061
+    },
+    {
+      "task": "high_school_mathematics",
+      "zh": "高中数学",
+      "baseline": 0.2439,
+      "dst": 0.25,
+      "delta": 0.0061
+    },
+    {
+      "task": "economics",
+      "zh": "经济学",
+      "baseline": 0.2642,
+      "dst": 0.2642,
+      "delta": 0.0
+    },
+    {
+      "task": "elementary_commonsense",
+      "zh": "小学常识",
+      "baseline": 0.2525,
+      "dst": 0.2525,
+      "delta": 0.0
+    },
+    {
+      "task": "high_school_geography",
+      "zh": "高中地理",
+      "baseline": 0.2542,
+      "dst": 0.2542,
+      "delta": 0.0
+    },
+    {
+      "task": "chinese_literature",
+      "zh": "中国文学",
+      "baseline": 0.2598,
+      "dst": 0.2598,
+      "delta": 0.0
+    },
+    {
+      "task": "human_sexuality",
+      "zh": "人类性学",
+      "baseline": 0.254,
+      "dst": 0.254,
+      "delta": 0.0
+    },
+    {
+      "task": "high_school_politics",
+      "zh": "高中政治",
+      "baseline": 0.2517,
+      "dst": 0.2517,
+      "delta": 0.0
+    },
+    {
+      "task": "computer_security",
+      "zh": "计算机安全",
+      "baseline": 0.2573,
+      "dst": 0.2515,
+      "delta": -0.0058
+    },
+    {
+      "task": "conceptual_physics",
+      "zh": "概念物理",
+      "baseline": 0.2381,
+      "dst": 0.2313,
+      "delta": -0.0068
+    },
+    {
+      "task": "chinese_driving_rule",
+      "zh": "中国交通规则",
+      "baseline": 0.2519,
+      "dst": 0.2443,
+      "delta": -0.0076
+    },
+    {
+      "task": "logical",
+      "zh": "逻辑学",
+      "baseline": 0.2439,
+      "dst": 0.2358,
+      "delta": -0.0081
+    },
+    {
+      "task": "chinese_foreign_policy",
+      "zh": "中国外交政策",
+      "baseline": 0.2617,
+      "dst": 0.2523,
+      "delta": -0.0093
+    },
+    {
+      "task": "computer_science",
+      "zh": "计算机科学",
+      "baseline": 0.2647,
+      "dst": 0.2549,
+      "delta": -0.0098
+    },
+    {
+      "task": "professional_medicine",
+      "zh": "专业医学",
+      "baseline": 0.2527,
+      "dst": 0.242,
+      "delta": -0.0106
+    },
+    {
+      "task": "traditional_chinese_medicine",
+      "zh": "中医学",
+      "baseline": 0.2486,
+      "dst": 0.2378,
+      "delta": -0.0108
+    },
+    {
+      "task": "public_relations",
+      "zh": "公共关系",
+      "baseline": 0.2586,
+      "dst": 0.2471,
+      "delta": -0.0115
+    },
+    {
+      "task": "chinese_civil_service_exam",
+      "zh": "公务员考试",
+      "baseline": 0.2687,
+      "dst": 0.2562,
+      "delta": -0.0125
+    },
+    {
+      "task": "security_study",
+      "zh": "安全研究",
+      "baseline": 0.2667,
+      "dst": 0.2519,
+      "delta": -0.0148
+    },
+    {
+      "task": "sociology",
+      "zh": "社会学",
+      "baseline": 0.2522,
+      "dst": 0.2345,
+      "delta": -0.0177
+    },
+    {
+      "task": "world_religions",
+      "zh": "世界宗教",
+      "baseline": 0.2625,
+      "dst": 0.2437,
+      "delta": -0.0188
+    },
+    {
+      "task": "genetics",
+      "zh": "遗传学",
+      "baseline": 0.2727,
+      "dst": 0.25,
+      "delta": -0.0227
+    },
+    {
+      "task": "electrical_engineering",
+      "zh": "电气工程",
+      "baseline": 0.25,
+      "dst": 0.2267,
+      "delta": -0.0233
+    },
+    {
+      "task": "virology",
+      "zh": "病毒学",
+      "baseline": 0.2781,
+      "dst": 0.2544,
+      "delta": -0.0237
+    },
+    {
+      "task": "chinese_history",
+      "zh": "中国历史",
+      "baseline": 0.2755,
+      "dst": 0.2508,
+      "delta": -0.0248
+    },
+    {
+      "task": "international_law",
+      "zh": "国际法",
+      "baseline": 0.2595,
+      "dst": 0.2324,
+      "delta": -0.027
+    },
+    {
+      "task": "construction_project_management",
+      "zh": "建设工程管理",
+      "baseline": 0.259,
+      "dst": 0.2302,
+      "delta": -0.0288
+    },
+    {
+      "task": "global_facts",
+      "zh": "全球事实",
+      "baseline": 0.2819,
+      "dst": 0.2483,
+      "delta": -0.0336
+    },
+    {
+      "task": "clinical_knowledge",
+      "zh": "临床知识",
+      "baseline": 0.2911,
+      "dst": 0.2532,
+      "delta": -0.038
+    },
+    {
+      "task": "philosophy",
+      "zh": "哲学",
+      "baseline": 0.2476,
+      "dst": 0.2,
+      "delta": -0.0476
+    },
+    {
+      "task": "college_medicine",
+      "zh": "大学医学",
+      "baseline": 0.293,
+      "dst": 0.2418,
+      "delta": -0.0513
+    },
+    {
+      "task": "chinese_food_culture",
+      "zh": "中国饮食文化",
+      "baseline": 0.2868,
+      "dst": 0.2279,
+      "delta": -0.0588
+    },
+    {
+      "task": "college_actuarial_science",
+      "zh": "大学精算学",
+      "baseline": 0.3113,
+      "dst": 0.2453,
+      "delta": -0.066
+    },
+    {
+      "task": "high_school_chemistry",
+      "zh": "高中化学",
+      "baseline": 0.3182,
+      "dst": 0.25,
+      "delta": -0.0682
+    }
+  ]
+}

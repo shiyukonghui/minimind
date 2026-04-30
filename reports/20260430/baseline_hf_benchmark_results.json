@@ -1,8 +1,8 @@
 {
   "C-Eval": {
     "dataset": "C-Eval",
-    "accuracy": 0.22436849925705796,
-    "correct": 302,
+    "accuracy": 0.23179791976225855,
+    "correct": 312,
     "total": 1346,
     "by_task": {
       "accountant": {
@@ -14,7 +14,7 @@
         "total": 19
       },
       "art_studies": {
-        "correct": 7,
+        "correct": 11,
         "total": 33
       },
       "basic_medicine": {
@@ -66,7 +66,7 @@
         "total": 16
       },
       "education_science": {
-        "correct": 5,
+        "correct": 12,
         "total": 29
       },
       "electrical_engineer": {
@@ -114,7 +114,7 @@
         "total": 19
       },
       "ideological_and_moral_cultivation": {
-        "correct": 4,
+        "correct": 6,
         "total": 19
       },
       "law": {
@@ -130,11 +130,11 @@
         "total": 22
       },
       "mao_zedong_thought": {
-        "correct": 8,
+        "correct": 9,
         "total": 24
       },
       "marxism": {
-        "correct": 8,
+        "correct": 5,
         "total": 19
       },
       "metrology_engineer": {
@@ -178,7 +178,7 @@
         "total": 19
       },
       "physician": {
-        "correct": 14,
+        "correct": 13,
         "total": 49
       },
       "plant_protection": {
@@ -217,24 +217,24 @@
   },
   "CMMLU": {
     "dataset": "CMMLU",
-    "accuracy": 0.25341046451390087,
-    "correct": 2935,
+    "accuracy": 0.25133828354342946,
+    "correct": 2911,
     "total": 11582,
     "by_task": {
       "agronomy": {
-        "correct": 42,
+        "correct": 39,
         "total": 169
       },
       "anatomy": {
-        "correct": 40,
+        "correct": 38,
         "total": 148
       },
       "ancient_chinese": {
-        "correct": 47,
+        "correct": 42,
         "total": 164
       },
       "arts": {
-        "correct": 41,
+        "correct": 38,
         "total": 160
       },
       "astronomy": {
@@ -242,7 +242,7 @@
         "total": 165
       },
       "business_ethics": {
-        "correct": 53,
+        "correct": 54,
         "total": 209
       },
       "chinese_civil_service_exam": {
@@ -250,11 +250,11 @@
         "total": 160
       },
       "chinese_driving_rule": {
-        "correct": 32,
+        "correct": 33,
         "total": 131
       },
       "chinese_food_culture": {
-        "correct": 31,
+        "correct": 32,
         "total": 136
       },
       "chinese_foreign_policy": {
@@ -266,11 +266,11 @@
         "total": 323
       },
       "chinese_literature": {
-        "correct": 53,
+        "correct": 56,
         "total": 204
       },
       "chinese_teacher_qualification": {
-        "correct": 47,
+        "correct": 50,
         "total": 179
       },
       "clinical_knowledge": {
@@ -290,7 +290,7 @@
         "total": 106
       },
       "college_law": {
-        "correct": 25,
+        "correct": 21,
         "total": 108
       },
       "college_mathematics": {
@@ -314,15 +314,15 @@
         "total": 171
       },
       "conceptual_physics": {
-        "correct": 34,
+        "correct": 35,
         "total": 147
       },
       "construction_project_management": {
-        "correct": 32,
+        "correct": 33,
         "total": 139
       },
       "economics": {
-        "correct": 42,
+        "correct": 38,
         "total": 159
       },
       "education": {
@@ -330,11 +330,11 @@
         "total": 163
       },
       "electrical_engineering": {
-        "correct": 39,
+        "correct": 47,
         "total": 172
       },
       "elementary_chinese": {
-        "correct": 72,
+        "correct": 70,
         "total": 252
       },
       "elementary_commonsense": {
@@ -390,11 +390,11 @@
         "total": 143
       },
       "human_sexuality": {
-        "correct": 32,
+        "correct": 27,
         "total": 126
       },
       "international_law": {
-        "correct": 43,
+        "correct": 42,
         "total": 185
       },
       "journalism": {
@@ -402,15 +402,15 @@
         "total": 172
       },
       "jurisprudence": {
-        "correct": 107,
+        "correct": 111,
         "total": 411
       },
       "legal_and_moral_basis": {
-        "correct": 56,
+        "correct": 53,
         "total": 214
       },
       "logical": {
-        "correct": 29,
+        "correct": 31,
         "total": 123
       },
       "machine_learning": {
@@ -418,19 +418,19 @@
         "total": 122
       },
       "management": {
-        "correct": 52,
+        "correct": 53,
         "total": 210
       },
       "marketing": {
-        "correct": 49,
+        "correct": 40,
         "total": 180
       },
       "marxist_theory": {
-        "correct": 48,
+        "correct": 45,
         "total": 189
       },
       "modern_chinese": {
-        "correct": 28,
+        "correct": 30,
         "total": 116
       },
       "nutrition": {
@@ -442,7 +442,7 @@
         "total": 105
       },
       "professional_accounting": {
-        "correct": 47,
+        "correct": 44,
         "total": 175
       },
       "professional_law": {
@@ -458,7 +458,7 @@
         "total": 232
       },
       "public_relations": {
-        "correct": 43,
+        "correct": 45,
         "total": 174
       },
       "security_study": {
@@ -466,15 +466,15 @@
         "total": 135
       },
       "sociology": {
-        "correct": 53,
+        "correct": 51,
         "total": 226
       },
       "sports_science": {
-        "correct": 43,
+        "correct": 39,
         "total": 165
       },
       "traditional_chinese_medicine": {
-        "correct": 44,
+        "correct": 43,
         "total": 185
       },
       "virology": {
