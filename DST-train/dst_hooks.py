@@ -8,152 +8,38 @@ from collections import defaultdict
 
 
 class MBEMonitor:
-    """矩阵基熵(MBE)监控器
-    通过对模型权重矩阵做SVD分解计算归一化熵，
-    判断模型是否达到"学习饱和"状态。
+    """矩阵基熵(MBE)监控器 — 已禁用
+    MBE基于SVD奇异值分布熵，对MiniMind小模型(hidden_size=512)失效：
+    512个奇异值天然接近均匀分布(Marchenko-Pastur定律)，归一化熵≈1.0永不下降。
+    同时forward hooks中act.float()产生大量临时显存(~369MB)，触发RTX 4090 swap。
+    饱和检测功能已由GNDMonitor替代。
     """
 
     def __init__(self, model, monitor_layers=None, threshold=0.3, patience=5):
-        """
-        Args:
-            model: 要监控的模型
-            monitor_layers: 指定监控的层名称列表，None则监控所有Linear层
-            threshold: MBE饱和阈值，低于此值认为模型"学累了"
-            patience: 连续低于阈值的步数，超过则判定为饱和
-        """
         self.model = model
         self.threshold = threshold
         self.patience = patience
         self.hooks = []
-        self.mbe_history = defaultdict(list)  # 每层的MBE历史
-        self.low_mbe_count = 0  # 连续低于阈值的计数
-        self.activation_stats = {}  # 激活值统计
 
-        # 注册forward hook来收集激活值统计
-        self._register_hooks(monitor_layers)
+    # def _register_hooks(self, monitor_layers):
+    #     pass
 
-    def _register_hooks(self, monitor_layers):
-        """在指定层注册forward hook"""
-        for name, module in self.model.named_modules():
-            if isinstance(module, nn.Linear):
-                if monitor_layers is None or any(layer in name for layer in monitor_layers):
-                    hook = module.register_forward_hook(self._make_hook(name))
-                    self.hooks.append(hook)
+    # def _make_hook(self, name):
+    #     pass
 
-    def _make_hook(self, name):
-        """为指定层创建hook回调"""
-        def hook_fn(module, input, output):
-            # 记录激活值的统计信息（不计算梯度）
-            with torch.no_grad():
-                act = output.detach()
-                self.activation_stats[name] = {
-                    'mean': act.float().mean().item(),
-                    'std': act.float().std().item(),
-                    'zero_ratio': (act == 0).float().mean().item(),
-                    'shape': tuple(act.shape),
-                }
-        return hook_fn
+    # def compute_mbe(self, weight_matrix):
+    #     pass
 
-    def compute_mbe(self, weight_matrix):
-        """计算单个权重矩阵的矩阵基熵(MBE)
-        
-        Args:
-            weight_matrix: 2D权重张量 [out_features, in_features]
-        Returns:
-            归一化熵值，范围[0, 1]，越高表示信息分布越均匀
-        """
-        # 转为float32确保数值稳定
-        W = weight_matrix.float().detach()
-        if W.numel() == 0:
-            return 1.0
-        try:
-            # SVD分解，取奇异值
-            S = torch.linalg.svdvals(W)
-            # 归一化奇异值作为概率分布
-            S_norm = S / (S.sum() + 1e-10)
-            # 计算熵
-            entropy = -(S_norm * torch.log(S_norm + 1e-10)).sum()
-            # 最大熵（均匀分布时的熵）
-            max_entropy = torch.log(torch.tensor(S.shape[0], dtype=torch.float32, device=S.device))
-            if max_entropy == 0:
-                return 1.0
-            return (entropy / max_entropy).item()
-        except Exception:
-            # SVD分解失败时返回1.0（假设未饱和）
-            return 1.0
+    # def check_model_mbe(self):
+    #     pass
 
-    def check_model_mbe(self):
-        """检查模型所有线性层的MBE
-        
-        Returns:
-            dict: 每层的MBE值
-            float: 平均MBE
-            bool: 是否饱和
-        """
-        layer_mbe = {}
-        for name, param in self.model.named_parameters():
-            if 'weight' in name and param.dim() == 2:
-                mbe = self.compute_mbe(param.data)
-                layer_mbe[name] = mbe
-                self.mbe_history[name].append(mbe)
+    # def compute_sparsity(self):
+    #     pass
 
-        if not layer_mbe:
-            return {}, 1.0, False
-
-        avg_mbe = sum(layer_mbe.values()) / len(layer_mbe)
-
-        # 判断是否饱和
-        if avg_mbe < self.threshold:
-            self.low_mbe_count += 1
-        else:
-            self.low_mbe_count = 0
-
-        is_saturated = self.low_mbe_count >= self.patience
-        return layer_mbe, avg_mbe, is_saturated
-
-    def compute_sparsity(self):
-        """计算模型当前的权重稀疏度（零权重占比）
-        
-        Returns:
-            dict: 每层的稀疏度
-            float: 整体稀疏度
-        """
-        layer_sparsity = {}
-        total_zeros = 0
-        total_params = 0
-        for name, param in self.model.named_parameters():
-            if 'weight' in name and param.dim() == 2:
-                n_zeros = (param.data == 0).sum().item()
-                n_total = param.numel()
-                layer_sparsity[name] = n_zeros / n_total
-                total_zeros += n_zeros
-                total_params += n_total
-
-        overall = total_zeros / total_params if total_params > 0 else 0.0
-        return layer_sparsity, overall
-
-    def report(self):
-        """生成当前模型状态报告"""
-        layer_mbe, avg_mbe, is_saturated = self.check_model_mbe()
-        layer_sparsity, overall_sparsity = self.compute_sparsity()
-
-        report_lines = ["=" * 50, "DST 模型诊断报告", "=" * 50]
-        report_lines.append(f"平均MBE: {avg_mbe:.4f} (阈值: {self.threshold}, 饱和: {is_saturated})")
-        report_lines.append(f"整体稀疏度: {overall_sparsity:.2%}")
-        report_lines.append(f"连续低MBE计数: {self.low_mbe_count}/{self.patience}")
-        report_lines.append("-" * 50)
-        report_lines.append(f"{'层名':<50} {'MBE':>8} {'稀疏度':>8}")
-        report_lines.append("-" * 50)
-        for name in layer_mbe:
-            mbe = layer_mbe[name]
-            sp = layer_sparsity.get(name, 0.0)
-            short_name = name[-48:] if len(name) > 48 else name
-            report_lines.append(f"{short_name:<50} {mbe:>8.4f} {sp:>8.2%}")
-
-        return "\n".join(report_lines)
+    # def report(self):
+    #     pass
 
     def remove_hooks(self):
-        """移除所有注册的hook"""
         for hook in self.hooks:
             hook.remove()
         self.hooks.clear()
@@ -260,3 +146,83 @@ class DeadNeuronDetector:
         report_lines.append(f"总计: {total_dead}/{total_neurons} ({overall_ratio:.2%})")
 
         return "\n".join(report_lines)
+
+
+class GNDMonitor:
+    """梯度范数衰减(GND)监控器
+    通过追踪梯度L2范数的衰减比例，判断模型是否达到训练饱和状态。
+    梯度范数直接度量"模型还在学多少"，对所有模型尺寸均有效。
+    替代MBE(矩阵基熵)在小模型(hidden_size=512)上失效的问题。
+    """
+
+    def __init__(self, model, threshold=0.1, patience=3):
+        """
+        Args:
+            model: 要监控的模型（需传入原始模型，非DDP包装）
+            threshold: 梯度范数衰减比例阈值，当前/峰值 < 此值认为饱和
+            patience: 连续低于阈值的次数，超过则判定为饱和
+        """
+        self.model = model
+        self.threshold = threshold
+        self.patience = patience
+        self.peak_grad_norm = None  # 历史梯度范数峰值
+        self.low_count = 0  # 连续低于阈值的计数
+        self.history = []  # (ratio, grad_norm) 历史记录
+
+    def compute_grad_norm(self):
+        """计算所有2D权重的全局梯度L2范数
+        遍历模型中所有2维weight参数（Linear层权重），累加其梯度的L2范数平方和再开方。
+
+        Returns:
+            float: 全局梯度L2范数
+        """
+        total_norm_sq = 0.0
+        for name, param in self.model.named_parameters():
+            if 'weight' in name and param.dim() == 2 and param.grad is not None:
+                total_norm_sq += param.grad.detach().float().norm().item() ** 2
+        return total_norm_sq ** 0.5
+
+    def check_saturation(self):
+        """检查梯度是否衰减至饱和水平
+        首次调用时记录梯度范数峰值，后续调用计算当前范数与峰值的比值。
+        当比值连续低于阈值超过patience次时，判定为饱和。
+
+        Returns:
+            bool: 是否饱和
+            float: 当前梯度范数 / 峰值的比值
+            float: 当前梯度范数值
+        """
+        grad_norm = self.compute_grad_norm()
+
+        if self.peak_grad_norm is None or grad_norm > self.peak_grad_norm:
+            self.peak_grad_norm = grad_norm
+
+        ratio = grad_norm / (self.peak_grad_norm + 1e-10)
+        self.history.append((ratio, grad_norm))
+
+        if ratio < self.threshold:
+            self.low_count += 1
+        else:
+            self.low_count = 0
+
+        is_saturated = self.low_count >= self.patience
+        return is_saturated, ratio, grad_norm
+
+    def report(self):
+        """生成当前GND状态报告"""
+        lines = ["=" * 50, "GND (梯度范数衰减) 诊断报告", "=" * 50]
+        if self.peak_grad_norm is not None:
+            lines.append(f"峰值梯度范数: {self.peak_grad_norm:.4f}")
+        else:
+            lines.append("峰值梯度范数: 未记录")
+        if self.history:
+            last_ratio, last_norm = self.history[-1]
+            lines.append(f"最近梯度范数: {last_norm:.4f}, 衰减比例: {last_ratio:.6f}")
+        lines.append(f"饱和阈值: {self.threshold}, 连续低范数计数: {self.low_count}/{self.patience}")
+        lines.append("-" * 50)
+        if self.history:
+            lines.append("GND历史 (最近10次):")
+            for i, (r, n) in enumerate(self.history[-10:]):
+                marker = " <-- 低于阈值" if r < self.threshold else ""
+                lines.append(f"  [{len(self.history) - 10 + i + 1}] ratio={r:.6f}, norm={n:.4f}{marker}")
+        return "\n".join(lines)

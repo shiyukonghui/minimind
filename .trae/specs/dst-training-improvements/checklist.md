@@ -1,0 +1,25 @@
+# Checklist
+
+- [x] `dst_hooks.py` 中已新增 `GNDMonitor` 类
+- [x] `GNDMonitor.__init__` 接受 `model, threshold=0.1, patience=3` 参数
+- [x] `GNDMonitor.compute_grad_norm()` 正确计算所有2D权重的梯度L2范数
+- [x] `GNDMonitor.check_saturation()` 首次调用记录peak，后续计算ratio并累计low_count
+- [x] `GNDMonitor.check_saturation()` 正确返回 `(is_saturated, ratio, grad_norm)` 三元组
+- [x] `GNDMonitor.report()` 返回可读的状态摘要字符串
+- [x] `train_dst.py` 中已从 `dst_hooks` 导入 `GNDMonitor`
+- [x] `train_dst.py` 中已新增 `--phase1_max_epochs` 参数（默认=phase1_epochs）
+- [x] `train_dst.py` 中已新增 `--gnd_threshold` 参数（默认=0.1）
+- [x] `train_dst.py` 中已新增 `--gnd_patience` 参数（默认=3）
+- [x] `train_dst.py` 阶段一训练循环中，在 `optimizer.step()` 之后调用 `gnd_monitor.check_saturation()`
+- [x] `train_dst.py` 阶段一训练循环中，`is_saturated=True` 时 `break` 跳出循环
+- [x] `train_dst.py` 阶段一结束后打印正确的退出原因日志
+- [x] `train_dst.py` 阶段一结束后打印GND诊断报告
+- [x] `train_dst.py` 中MBE监控降级为纯诊断日志（`[DST-MBE-Diag]` 前缀）
+- [x] `train_dst.py` 中 `--phase3_epochs` 默认值已从 3 改为 0
+- [x] `train_dst.py` 阶段三入口处有 `if args.phase3_epochs <= 0: skip` 的分支判断
+- [x] `train_dst.py` 跳过阶段三时打印了说明日志
+- [x] `train_dst.py` 中 `--phase1_batch_size` 默认值已从 32 改为 300
+- [x] `train_dst.py` 中 `--phase1_accumulation_steps` 默认值已从 8 改为 1
+- [x] `train_baseline.py` 中 `--batch_size` 默认值已从 32 改为 300
+- [x] `train_baseline.py` 中 `--accumulation_steps` 默认值已从 8 改为 1
+- [x] 所有修改后的代码无语法错误，lint通过
