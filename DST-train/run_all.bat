@@ -106,7 +106,7 @@ echo.
 echo ------------------------------------------------------------
 echo   Evaluating Baseline Model
 echo ------------------------------------------------------------
-"%PYTHON%" eval_benchmark.py --model_path DST-train\model\baseline_hf --dataset all
+"%PYTHON%" eval_benchmark.py --model_path "%CD%\DST-train\model\baseline_hf" --dataset all
 if errorlevel 1 (
     echo [WARN] Baseline evaluation failed, continuing...
 )
@@ -115,7 +115,7 @@ echo.
 echo ------------------------------------------------------------
 echo   Evaluating DST Model
 echo ------------------------------------------------------------
-"%PYTHON%" eval_benchmark.py --model_path DST-train\model\dst_hf --dataset all
+"%PYTHON%" eval_benchmark.py --model_path "%CD%\DST-train\model\dst_hf" --dataset all
 if errorlevel 1 (
     echo [WARN] DST evaluation failed
 )

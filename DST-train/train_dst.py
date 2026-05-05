@@ -327,9 +327,9 @@ if __name__ == "__main__":
     # 阶段一参数（与基线一致）
     parser.add_argument("--phase1_data_path", type=str, default="dataset/pretrain_t2t_mini.jsonl", help="预训练数据路径")
     parser.add_argument("--phase1_epochs", type=int, default=1, help="预训练轮数(与基线相同)")
-    parser.add_argument("--phase1_batch_size", type=int, default=300, help="批大小")
+    parser.add_argument("--phase1_batch_size", type=int, default=128, help="批大小")
     parser.add_argument("--phase1_lr", type=float, default=5e-4, help="学习率")
-    parser.add_argument("--phase1_accumulation_steps", type=int, default=1, help="梯度累积步数")
+    parser.add_argument("--phase1_accumulation_steps", type=int, default=8, help="梯度累积步数")
     parser.add_argument('--max_seq_len', default=512, type=int, help="训练的最大截断长度")
 
     # 阶段二参数
