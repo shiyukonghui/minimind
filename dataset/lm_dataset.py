@@ -245,5 +245,100 @@ class RLAIFDataset(Dataset):
         }
 
 
+class BytePretrainDataset(Dataset):
+    """字节级预训练数据集：文本 -> UTF-8 字节 id 序列（0-255），PAD=256 补齐。
+
+    配合 ByteTokenizer 与 vocab_size=260 的字节模型使用（设计文档 §3.6 路线α阶段2）。
+    """
+
+    def __init__(self, data_path, tokenizer, max_length=512):
+        super().__init__()
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+        self.samples = self.load_data(data_path)
+
+    def load_data(self, path):
+        samples = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    samples.append(json.loads(line))
+        return samples
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, index):
+        text = str(self.samples[index]['text'])
+        ids = self.tokenizer.encode(text)[:self.max_length]
+        ids = ids + [self.tokenizer.pad_token_id] * (self.max_length - len(ids))
+        input_ids = torch.tensor(ids, dtype=torch.long)
+        loss_mask = (input_ids != self.tokenizer.pad_token_id).long()
+        return input_ids[:-1], input_ids[1:], loss_mask[1:]
+
+
+class ByteSFTDataset(Dataset):
+    """字节级 SFT 数据集：在字节 id 空间直接构造对话与损失掩码。
+
+    对话渲染（与 ByteTokenizer 约定一致，特殊 token 用 id 257/258 而非文本字节）：
+      每条消息 = [BOS] + bytes(role) + bytes('\\n') + bytes(content) + [EOS] + bytes('\\n')
+      assistant 消息的 content 起(含 role 换行后)到 EOS(含) 位置 mask=1，其余 0。
+    """
+
+    def __init__(self, jsonl_path, tokenizer, max_length=1024):
+        super().__init__()
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+        self.samples = self.load_data(jsonl_path)
+        self.bos_id = tokenizer.bos_token_id
+        self.eos_id = tokenizer.eos_token_id
+        self.pad_id = tokenizer.pad_token_id
+
+    def load_data(self, path):
+        samples = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    samples.append(json.loads(line))
+        return samples
+
+    def __len__(self):
+        return len(self.samples)
+
+    def _render(self, conversations):
+        """返回 (ids, loss_mask)。conversations: [{role, content}, ...]"""
+        ids, mask = [], []
+        for m in conversations:
+            role_bytes = list(str(m['role']).encode('utf-8')) + list(b'\n')
+            content_bytes = list(str(m['content']).encode('utf-8'))
+            # 段1: BOS + role + '\n'   （不监督）
+            seg = [self.bos_id] + role_bytes
+            ids += seg
+            mask += [0] * len(seg)
+            # 段2: content + EOS        （assistant 才监督）
+            sup = 1 if m['role'] == 'assistant' else 0
+            seg = content_bytes + [self.eos_id]
+            ids += seg
+            mask += [sup] * len(seg)
+            # 段3: '\n' 分隔             （不监督）
+            ids += list(b'\n')
+            mask += [0]
+        return ids, mask
+
+    def __getitem__(self, index):
+        sample = self.samples[index]
+        ids, mask = self._render(sample['conversations'])
+        ids = ids[:self.max_length]
+        mask = mask[:self.max_length]
+        pad = self.max_length - len(ids)
+        ids = ids + [self.pad_id] * pad
+        mask = mask + [0] * pad
+        input_ids = torch.tensor(ids, dtype=torch.long)
+        loss_mask = torch.tensor(mask, dtype=torch.long)
+        return input_ids[:-1], input_ids[1:], loss_mask[1:]
+
+
 if __name__ == "__main__":
     pass

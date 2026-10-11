@@ -179,9 +179,9 @@ class MemoryBackend:
 | ③ | Looped block 改造：timestep 编码、DeepLoop 残差缩放、Jev 三决策头 + MoL 专家池 | 独立 | ✅ 完成并测试（[model/model_loop_mol.py](file:///f:/MachineLearn/minimind/model/model_loop_mol.py)，54.6 万可训练参数） |
 | ④ | E1-C 统计画像脚本 + E1-D 移植脚本（供体 Qwen2.5-0.5B bf16） | 独立 | ✅ 完成并测试（[scripts/e1_init_ablation.py](file:///f:/MachineLearn/minimind/scripts/e1_init_ablation.py)；供体已下载，画像/采样/移植产物均可 strict 加载并前向） |
 | ⑤ | MemoryBackend 标准接口（HashTable/ExternalKV/QwenPLEAdapter） | ② | ✅ 完成并测试（[model/memory_backend.py](file:///f:/MachineLearn/minimind/model/memory_backend.py)） |
-| ⑥ | 字节化路线α：ALP 转换 `pretrain_512.pth` | 独立 | ⏳ |
+| ⑥ | 字节化路线α：ALP 转换 `pretrain_512.pth` | 独立 | ✅ 前置完成（[model/byte_tokenizer.py](file:///f:/MachineLearn/minimind/model/byte_tokenizer.py) + [scripts/alp_byte_convert.py](file:///f:/MachineLearn/minimind/scripts/alp_byte_convert.py) + 字节数据集；阶段1 闭式转换产物 `pretrain_512_byteinit.pth` 已生成并测试，阶段2 端到端微调待接训练） |
 | ⑦ | SSR 合并工具 + Jev 共激活聚类 | ③ | ✅ 完成并测试（[model/ssr_merge.py](file:///f:/MachineLearn/minimind/model/ssr_merge.py)；Q 矩阵按 ssr-lora.md 文字近似实现，精确公式待 tech_report 精校） |
-| ⑧ | 蒸馏管道（V4.1-Flash API 序列级） | 独立 | ⏳ |
+| ⑧ | 蒸馏管道（V4.1-Flash API 序列级） | 独立 | ✅ 前置完成（[scripts/teacher_client.py](file:///f:/MachineLearn/minimind/scripts/teacher_client.py) urllib 兼容客户端 + 缓存/限速/重试 + [scripts/gen_distill_data.py](file:///f:/MachineLearn/minimind/scripts/gen_distill_data.py) + 种子集；dry_run 全链路验证通过，真实生成待 `DEEPSEEK_API_KEY`） |
 | 后台 | BF16 PLE 分片下载（~104GB，hf-mirror，见 §6） | 不阻塞② | ⏳ 进行中（~9/33 片） |
 | 后台 | E1-D 供体 Qwen2.5-0.5B bf16 下载（~1GB，见 §6） | 不阻塞 | ⏳ 进行中 |
 
