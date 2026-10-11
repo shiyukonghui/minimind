@@ -1,0 +1,130 @@
+{
+ "files": [
+  "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+  "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf"
+ ],
+ "alignment": 32,
+ "kv_meta": {
+  "general.architecture": "qwen4exp",
+  "qwen4exp.block_count": 48,
+  "qwen4exp.embedding_length": 2560,
+  "qwen4exp.ple.layers": [
+   1
+  ],
+  "qwen4exp.ple.ngram_size": 3,
+  "qwen4exp.ple.heads_per_ngram": 8,
+  "qwen4exp.ple.conv_kernel": 4,
+  "qwen4exp.ple.eos_token_id": 248044,
+  "qwen4exp.ple.layer_multipliers": [
+   23703573157769,
+   20109073645365,
+   8052911324071
+  ],
+  "qwen4exp.ple.head_offsets": [
+   0,
+   20000003,
+   40000026,
+   60000059,
+   80000106,
+   100000165,
+   120000228,
+   140000297,
+   160000374,
+   180000455,
+   200000548,
+   220000655,
+   240000802,
+   260000955,
+   280001114,
+   300001275
+  ],
+  "qwen4exp.ple.head_vocab_sizes": [
+   20000003,
+   20000023,
+   20000033,
+   20000047,
+   20000059,
+   20000063,
+   20000069,
+   20000077,
+   20000081,
+   20000093,
+   20000107,
+   20000147,
+   20000153,
+   20000159,
+   20000161,
+   20000171
+  ],
+  "qwen4exp.ple.image_token_id": 248056
+ },
+ "tensors": [
+  {
+   "name": "blk.1.ple_conv1d.weight",
+   "shape": [
+    4,
+    10240
+   ],
+   "dtype": "F16",
+   "offset": 2898207616,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+  },
+  {
+   "name": "blk.1.ple_key.weight",
+   "shape": [
+    2560,
+    10240
+   ],
+   "dtype": "BF16",
+   "offset": 2898289536,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+  },
+  {
+   "name": "blk.1.ple_norm_conv.weight",
+   "shape": [
+    10240
+   ],
+   "dtype": "F32",
+   "offset": 2950718336,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+  },
+  {
+   "name": "blk.1.ple_norm_key.weight",
+   "shape": [
+    10240
+   ],
+   "dtype": "F32",
+   "offset": 2950759296,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+  },
+  {
+   "name": "blk.1.ple_norm_query.weight",
+   "shape": [
+    10240
+   ],
+   "dtype": "F32",
+   "offset": 2950800256,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+  },
+  {
+   "name": "blk.1.ple_value.weight",
+   "shape": [
+    2560,
+    2560
+   ],
+   "dtype": "BF16",
+   "offset": 2950841216,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf"
+  },
+  {
+   "name": "per_layer_token_embd.weight",
+   "shape": [
+    160,
+    320001536
+   ],
+   "dtype": "IQ4_NL",
+   "offset": 0,
+   "file": "H:\\Strata-data\\models\\IQ3_S\\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf"
+  }
+ ]
+}
