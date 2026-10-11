@@ -121,8 +121,8 @@ class MemoryBackend:
 
 | 路径 | 做法 | 训练量 | 依赖 |
 |---|---|---|---|
-| 1. QwenPLEBackend 桥接 | bytes → 现场 Qwen BPE → 哈希 → mmap 查表（IQ4_NL 反量化）→ 低秩投影+门控（约 17.6 万参数） | ~10-20 万参数 | 现有 GGUF，**已实现并测试通过** |
-| 2. 离线蒸馏建自有字节表 | 用 BF16 源表蒸馏出字节键小表 | 蒸馏管道 | BF16 分片下载 |
+| 1. QwenPLEBackend 桥接 | bytes → 现场 Qwen BPE → 哈希 → mmap 查表 → 低秩投影+门控（约 17.6 万参数） | ~10-20 万参数 | ✅ 双源就绪：`source='gguf'`(IQ4_NL) / `source='bf16'`(HF 零损失，行序与 GGUF 列索引交叉验证对齐，读行快 14×) |
+| 2. 离线蒸馏建自有字节表 | 用 BF16 源表蒸馏出字节键小表 | 蒸馏管道 | BF16 分片 ✅ 已下载（97.1GB） |
 | 3. 探针式知识先验清单 | 只读表做知识探针/评测先验 | 0 | 现有 GGUF |
 
 ### 3.6 字节化路线（Engram 通用的前提）
@@ -182,8 +182,8 @@ class MemoryBackend:
 | ⑥ | 字节化路线α：ALP 转换 `pretrain_512.pth` | 独立 | ✅ 前置完成（[model/byte_tokenizer.py](file:///f:/MachineLearn/minimind/model/byte_tokenizer.py) + [scripts/alp_byte_convert.py](file:///f:/MachineLearn/minimind/scripts/alp_byte_convert.py) + 字节数据集；阶段1 闭式转换产物 `pretrain_512_byteinit.pth` 已生成并测试，阶段2 端到端微调待接训练） |
 | ⑦ | SSR 合并工具 + Jev 共激活聚类 | ③ | ✅ 完成并测试（[model/ssr_merge.py](file:///f:/MachineLearn/minimind/model/ssr_merge.py)；Q 矩阵按 ssr-lora.md 文字近似实现，精确公式待 tech_report 精校） |
 | ⑧ | 蒸馏管道（V4.1-Flash API 序列级） | 独立 | ✅ 前置完成（[scripts/teacher_client.py](file:///f:/MachineLearn/minimind/scripts/teacher_client.py) urllib 兼容客户端 + 缓存/限速/重试 + [scripts/gen_distill_data.py](file:///f:/MachineLearn/minimind/scripts/gen_distill_data.py) + 种子集；dry_run 全链路验证通过，真实生成待 `DEEPSEEK_API_KEY`） |
-| 后台 | BF16 PLE 分片下载（~104GB，hf-mirror，见 §6） | 不阻塞② | ⏳ 进行中（~9/33 片） |
-| 后台 | E1-D 供体 Qwen2.5-0.5B bf16 下载（~1GB，见 §6） | 不阻塞 | ⏳ 进行中 |
+| 后台 | BF16 PLE 分片下载（~104GB，hf-mirror，见 §6） | 不阻塞② | ✅ 完成（33/33 片 97.1GB，抽查 shard_0=[2500012,160] BF16、heads_offsets 与 GGUF 元数据逐项一致） |
+| 后台 | E1-D 供体 Qwen2.5-0.5B bf16 下载（~1GB，见 §6） | 不阻塞 | ✅ 完成（942MB，E1-C 画像/E1-D 移植已基于其运行） |
 
 **关键实现事实修正**：GGUF 分片2 的 PLE 大表经字节核算实为 **IQ4_NL**（4.5bpw，非早前误记的 IQ3_S）；门控 ple_key/ple_value 为 BF16。反量化码本取自本地 `ggml-common.h kvalues_iq4nl`，端到端测试与 C++ 哈希公式手算一致（含 EOS 重置）。
 

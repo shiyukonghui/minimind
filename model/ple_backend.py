@@ -12,6 +12,7 @@
 #     码本 kvalues=[-127,-104,...,113]，block 内顺序为 16 个低 nibble 再 16 个高 nibble
 #   - 门控(build_ple L1130-1212)：s=Σ(key⊙query)/√d，gate=σ(sign(s)·√|s|)，out=hidden+gate⊙value+conv
 import json
+import struct
 import numpy as np
 import torch
 from torch import nn
@@ -121,6 +122,80 @@ class PLEHashIndexer:
         return out
 
 
+class BF16ShardTable:
+    """HF BF16 源：从 33 个 safetensors 分片(128 段 ngram_embedding.shard_*)按全局行号读 160 维向量。
+
+    与 IQ4NLMmapTable 接口一致(.row/.rows)，供 QwenPLEBackend 无缝切换源。
+    行对齐已交叉验证(verify_bf16_alignment.py：与 GGUF IQ4_NL 同列相关 ~0.997)：
+      全局行 r -> shard 段 n = r // 2500012，片内行 = r % 2500012。
+    BF16 无原生 numpy dtype：按 uint16 读出后 <<16 重铸为 float32(位操作，零近似)。
+    """
+
+    ROWS_PER_SHARD = 2500012
+    HEAD_DIM = 160
+
+    def __init__(self, hf_dir: str, index_file: str = 'model.safetensors.index.json',
+                 cache_size: int = 4096):
+        import os
+        idx = json.load(open(os.path.join(hf_dir, index_file), encoding='utf-8'))
+        wm = idx['weight_map']
+        # 收集 shard 段 -> 文件；解析每个文件一次 safetensors 头，得各段数据起始偏移
+        self.seg_file, self.seg_off = {}, {}          # n -> (path, byte_offset)
+        files = sorted(set(v for k, v in wm.items() if 'ngram_embedding.shard_' in k))
+        for fname in files:
+            path = os.path.join(hf_dir, fname)
+            with open(path, 'rb') as f:
+                hlen = struct.unpack('<Q', f.read(8))[0]
+                header = json.loads(f.read(hlen))
+            for k, meta in header.items():
+                if 'ngram_embedding.shard_' in k:
+                    n = int(k.split('shard_')[1].split('.')[0])
+                    # safetensors 数据区从 (8+hlen) 向上取 8 字节对齐处开始
+                    data_start = (8 + hlen + 7) // 8 * 8
+                    data_begin = meta['data_offsets'][0]
+                    assert meta['dtype'] == 'BF16' and meta['shape'][1] == self.HEAD_DIM
+                    self.seg_file[n] = path
+                    self.seg_off[n] = data_start + data_begin
+        self.n_segments = len(self.seg_file)
+        assert self.n_segments == 128, f'期望 128 段，实得 {self.n_segments}'
+        self.n_rows = self.n_segments * self.ROWS_PER_SHARD
+        self.head_dim = self.HEAD_DIM
+        self.row_bytes = self.HEAD_DIM * 2              # BF16 每行 320B
+        self._mms = {}                                   # path -> memmap(uint16)
+        self.cache_size = cache_size
+        self._cache: "OrderedDict[int, np.ndarray]" = OrderedDict()
+        self.hits = self.misses = 0
+
+    def _mm(self, path):
+        if path not in self._mms:
+            # 整个文件按 uint16 mmap；行读取 = 偏移换算，无解码
+            self._mms[path] = np.memmap(path, dtype=np.uint16, mode='r')
+        return self._mms[path]
+
+    def row(self, idx: int) -> np.ndarray:
+        if idx in self._cache:
+            self._cache.move_to_end(idx)
+            self.hits += 1
+            return self._cache[idx]
+        self.misses += 1
+        n = idx // self.ROWS_PER_SHARD
+        local = idx % self.ROWS_PER_SHARD
+        path = self.seg_file[n]
+        mm = self._mm(path)
+        # 字节偏移 -> uint16 元素偏移
+        elem = (self.seg_off[n] + local * self.row_bytes) // 2
+        raw = np.asarray(mm[elem:elem + self.head_dim])
+        # uint16 -> float32：BF16 是 float32 高 16 位，左移补零即精确还原
+        vec = (raw.astype(np.uint32) << 16).view(np.float32)
+        if len(self._cache) >= self.cache_size:
+            self._cache.popitem(last=False)
+        self._cache[idx] = vec
+        return vec
+
+    def rows(self, idxs: np.ndarray) -> np.ndarray:
+        return np.stack([self.row(int(i)) for i in idxs], axis=0)
+
+
 class QwenPLEBackend(nn.Module):
     """冻结 PLE 表 + 可训练宿主侧投影/门控。
 
@@ -130,13 +205,23 @@ class QwenPLEBackend(nn.Module):
     """
 
     def __init__(self, shard2_path: str, host_hidden: int, embed_dim: int = 2560,
-                 meta_path: str = META_PATH, data_start: int = 192, proj_rank: int = 48):
+                 meta_path: str = META_PATH, data_start: int = 192, proj_rank: int = 48,
+                 source: str = 'gguf', hf_dir: str = r'H:\Strata-data\models\Qwen3.8-Flash-Next-BF16'):
         super().__init__()
         meta = json.load(open(meta_path, encoding='utf-8'))
         tbl = next(t for t in meta['tensors'] if 'per_layer_token_embd' in t['name'])
         self.head_dim = tbl['shape'][0]                              # 160
         self.n_rows = tbl['shape'][1]                                # 320001536
-        self.table = IQ4NLMmapTable(shard2_path, data_start, self.n_rows, self.head_dim)
+        if source == 'gguf':
+            # IQ4_NL 量化源：mmap 反量化读行（有 4.5bpw 量化噪声）
+            self.table = IQ4NLMmapTable(shard2_path, data_start, self.n_rows, self.head_dim)
+        elif source == 'bf16':
+            # HF BF16 源：零量化损失；行序与 GGUF 列索引已交叉验证对齐
+            self.table = BF16ShardTable(hf_dir)
+            assert self.table.n_rows == self.n_rows
+        else:
+            raise ValueError(f'未知源类型: {source}')
+        self.source = source
         self.indexer = PLEHashIndexer(meta)
         self.n_heads = self.indexer.n_heads
         self.embed_dim = self.n_heads * self.head_dim                # 2560
